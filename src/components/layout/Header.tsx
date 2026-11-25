@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Menu, Bell, LogOut, KeyRound } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import InstallButton from "../InstallButton";
 import ChangePinModal from "../../features/auth/ChangePinModal";
 import { useAuth } from "../../features/auth/useAuth";
 import { useAsync } from "../../lib/useAsync";
@@ -57,6 +58,8 @@ export default function Header({ onMenuClick, pageTitle }: HeaderProps) {
       </div>
 
       <div className="header-right">
+        <InstallButton />
+
         <button
           className="header-icon-button"
           aria-label="Notes and reminders"

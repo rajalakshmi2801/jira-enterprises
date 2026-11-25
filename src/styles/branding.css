@@ -171,6 +171,27 @@
   font-size: 14px;
 }
 
+/* ---------- install app button ---------- */
+
+.install-wrap {
+  position: relative;
+}
+
+.install-hint {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  z-index: 200;
+  width: 220px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: #172b4d;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+}
+
 /* ---------- print invoice helper ---------- */
 
 @media print {
