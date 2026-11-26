@@ -1,0 +1,186 @@
+/* ---------- Tax invoice (screen + print) ---------- */
+
+.invoice-sheet {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px 28px 30px;
+  background: #fff;
+  border: 1px solid #d9dee7;
+  border-radius: 6px;
+  color: #111827;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.invoice-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.invoice-logo {
+  width: 150px;
+}
+
+.invoice-datetime {
+  font-size: 11px;
+  color: #374151;
+}
+
+.invoice-title {
+  margin: 4px 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid #111827;
+  text-align: center;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.invoice-parties p {
+  margin: 0 0 5px;
+}
+
+.invoice-meta {
+  display: flex;
+  gap: 50px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.invoice-meta-line {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #111827;
+}
+
+.invoice-table-wrap {
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+.invoice-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.invoice-table th,
+.invoice-table td {
+  padding: 4px 6px;
+  border: 1px solid #6b7280;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.invoice-table th {
+  background: #f3f4f6;
+  font-weight: 700;
+}
+
+.invoice-table .left {
+  text-align: left;
+}
+
+.invoice-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.invoice-table tfoot td {
+  background: #f9fafb;
+  font-weight: 700;
+}
+
+.invoice-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #111827;
+  flex-wrap: wrap;
+}
+
+.invoice-summary p {
+  margin: 0 0 4px;
+}
+
+.invoice-summary-right {
+  min-width: 220px;
+}
+
+.invoice-notes {
+  margin: 8px 0 0;
+}
+
+.invoice-sign {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 34px;
+  padding-top: 8px;
+  border-top: 1px dashed #6b7280;
+}
+
+.invoice-sign p {
+  margin: 0 0 6px;
+}
+
+.invoice-sign-right {
+  text-align: right;
+}
+
+.invoice-sign-space {
+  margin-top: 36px !important;
+}
+
+.invoice-foot {
+  margin: 20px 0 0;
+  text-align: center;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+@media (max-width: 700px) {
+  .invoice-sheet {
+    padding: 16px 14px;
+  }
+}
+
+/* Print only the invoice sheet, landscape A4 */
+@page {
+  size: A4 landscape;
+  margin: 8mm;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .invoice-sheet,
+  .invoice-sheet * {
+    visibility: visible;
+  }
+
+  .invoice-sheet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .invoice-table-wrap {
+    overflow: visible;
+  }
+
+  .invoice-table {
+    min-width: 0;
+  }
+}

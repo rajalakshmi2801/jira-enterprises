@@ -11,6 +11,8 @@ import ProtectedRoute from "./features/auth/ProtectedRoute";
 import { AuthProvider } from "./features/auth/AuthContext";
 
 import SalesPage from "./features/sales/SalesPage";
+import InvoicesPage from "./features/invoices/InvoicesPage";
+import InvoiceViewPage from "./features/invoices/InvoiceViewPage";
 import CustomersPage from "./features/customers/CustomersPage";
 import InventoryPage from "./features/inventory/InventoryPage";
 import PurchasesPage from "./features/purchases/PurchasesPage";
@@ -41,6 +43,8 @@ export default function App() {
             <Route element={<AppLayout />}>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/sales" element={<SalesPage />} />
+              <Route path="/invoices" element={<InvoicesPage />} />
+              <Route path="/invoices/:saleId" element={<InvoiceViewPage />} />
               <Route path="/customers" element={<CustomersPage />} />
               <Route path="/inventory" element={<InventoryPage />} />
               <Route path="/purchases" element={<PurchasesPage />} />

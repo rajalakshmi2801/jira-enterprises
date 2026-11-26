@@ -6,18 +6,26 @@ export interface BusinessSettings {
     owner_name: string;
     email: string | null;
     mobile: string;
+    gst_number: string | null;
+    business_address: string | null;
+    licence_number: string | null;
+    licence_expiry: string | null;
 }
 
 export interface UpdateBusinessSettings {
     business_name?: string;
     owner_name?: string;
     email?: string | null;
+    gst_number?: string | null;
+    business_address?: string | null;
+    licence_number?: string | null;
+    licence_expiry?: string | null;
 }
 
 export const getBusinessSettings = async (): Promise<BusinessSettings> => {
     const { data, error } = await supabase
         .from("profiles")
-        .select("business_name, owner_name, email, mobile")
+        .select("business_name, owner_name, email, mobile, gst_number, business_address, licence_number, licence_expiry")
         .eq("role", "owner")
         .eq("is_active", true)
         .limit(1)
@@ -62,6 +70,22 @@ export const updateBusinessSettings = async (
 
     if (settings.email !== undefined) {
         updateData.email = settings.email?.trim() || null;
+    }
+
+    if (settings.gst_number !== undefined) {
+        updateData.gst_number = settings.gst_number?.trim() || null;
+    }
+
+    if (settings.business_address !== undefined) {
+        updateData.business_address = settings.business_address?.trim() || null;
+    }
+
+    if (settings.licence_number !== undefined) {
+        updateData.licence_number = settings.licence_number?.trim() || null;
+    }
+
+    if (settings.licence_expiry !== undefined) {
+        updateData.licence_expiry = settings.licence_expiry || null;
     }
 
     const { error } = await supabase

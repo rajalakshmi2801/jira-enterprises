@@ -30,6 +30,7 @@ interface SaleRecord {
     sale_date: string;
     total_amount: number | string | null;
     discount_amount: number | string | null;
+    gst_amount?: number | string | null;
     status: string;
 }
 
@@ -120,7 +121,7 @@ const getCompletedSales = async (
 ): Promise<SaleRecord[]> => {
     return fetchAllRows<SaleRecord>(
         "sales",
-        "id, invoice_number, customer_id, sale_date, total_amount, discount_amount, status",
+        "id, invoice_number, customer_id, sale_date, total_amount, discount_amount, gst_amount, status",
         (query) =>
             query
                 .eq("status", "completed")
@@ -307,8 +308,12 @@ export const getProfitReport = async (filters: ReportFilters) => {
 
     const expenses = await getExpenseRecords(filters);
 
+    // Sales value without GST (GST collected is not income).
     const totalSales = sales.reduce(
-        (sum, sale) => sum + Number(sale.total_amount ?? 0),
+        (sum, sale) =>
+            sum +
+            Number(sale.total_amount ?? 0) -
+            Number(sale.gst_amount ?? 0),
         0
     );
 

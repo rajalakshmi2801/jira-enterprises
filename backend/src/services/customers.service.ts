@@ -9,6 +9,7 @@ export interface CreateCustomerInput {
     shop_name?: string;
     mobile?: string;
     address?: string;
+    gst_number?: string;
     notes?: string;
 }
 
@@ -17,6 +18,7 @@ export interface UpdateCustomerInput {
     shop_name?: string | null;
     mobile?: string | null;
     address?: string | null;
+    gst_number?: string | null;
     notes?: string | null;
 }
 
@@ -33,6 +35,7 @@ export const getCustomers = async (search?: string) => {
             shop_name,
             mobile,
             address,
+            gst_number,
             notes,
             is_active,
             created_at,
@@ -71,6 +74,7 @@ export const getCustomerById = async (customerId: string) => {
             shop_name,
             mobile,
             address,
+            gst_number,
             notes,
             is_active,
             created_at,
@@ -104,6 +108,7 @@ export const createCustomer = async (
             shop_name: customer.shop_name?.trim() || null,
             mobile: customer.mobile?.trim() || null,
             address: customer.address?.trim() || null,
+            gst_number: customer.gst_number?.trim() || null,
             notes: customer.notes?.trim() || null,
             is_active: true
         })
@@ -137,6 +142,10 @@ export const updateCustomer = async (
 
     if (customer.mobile !== undefined) {
         updateData.mobile = customer.mobile?.trim() || null;
+    }
+
+    if (customer.gst_number !== undefined) {
+        updateData.gst_number = customer.gst_number?.trim() || null;
     }
 
     if (customer.address !== undefined) {

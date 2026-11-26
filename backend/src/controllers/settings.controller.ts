@@ -7,10 +7,16 @@ import {
     updateBusinessSettings
 } from "../services/settings.service";
 
+const GSTIN_PATTERN = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
+
 const updateSettingsSchema = z.object({
     business_name: z.string().trim().min(2).max(150).optional(),
     owner_name: z.string().trim().min(2).max(100).optional(),
-    email: z.string().trim().email().max(150).nullable().optional()
+    email: z.string().trim().email().max(150).nullable().optional(),
+    gst_number: z.string().trim().toUpperCase().regex(GSTIN_PATTERN, "Enter a valid 15-character GSTIN.").nullable().optional(),
+    business_address: z.string().trim().max(500).nullable().optional(),
+    licence_number: z.string().trim().max(50).nullable().optional(),
+    licence_expiry: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional()
 }).strict().refine(
     (data) => Object.keys(data).length > 0,
     {

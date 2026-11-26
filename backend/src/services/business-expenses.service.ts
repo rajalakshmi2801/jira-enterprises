@@ -41,7 +41,7 @@ export const getExpenses = async (
     if (filters.from) {
         query = query.gte(
             "expense_date",
-            /^d{4}-d{2}-d{2}$/.test(filters.from)
+            /^\d{4}-\d{2}-\d{2}$/.test(filters.from)
                 ? `${filters.from}T00:00:00`
                 : filters.from
         );
@@ -50,7 +50,7 @@ export const getExpenses = async (
     if (filters.to) {
         query = query.lte(
             "expense_date",
-            /^d{4}-d{2}-d{2}$/.test(filters.to)
+            /^\d{4}-\d{2}-\d{2}$/.test(filters.to)
                 ? `${filters.to}T23:59:59.999`
                 : filters.to
         );

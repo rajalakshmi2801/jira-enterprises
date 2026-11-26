@@ -29,6 +29,7 @@ import {
   StatCard,
   Tabs,
 } from "../../components/ui";
+import DailySalesTab from "./DailySalesTab";
 import { useAsync } from "../../lib/useAsync";
 import {
   downloadCsv,
@@ -44,6 +45,7 @@ import {
 } from "../../services/business.api";
 
 type TabId = "summary" | "sales" | "purchases" | "expenses";
+type ViewId = "daily" | "period";
 
 function presetRange(preset: string): ReportRange {
   const now = new Date();
@@ -87,6 +89,7 @@ const PRESETS = [
 export default function ReportsPage() {
   const [range, setRange] = useState<ReportRange>(presetRange("month"));
   const [tab, setTab] = useState<TabId>("summary");
+  const [view, setView] = useState<ViewId>("daily");
 
   const overview = useAsync(() => reportsApi.overview(range), [range.from, range.to]);
   const sales = useAsync(() => reportsApi.sales(range), [range.from, range.to]);
@@ -248,14 +251,29 @@ export default function ReportsPage() {
               <RefreshCw size={15} />
               Refresh
             </button>
-            <button className="ui-btn ui-btn-outline" onClick={exportCurrent}>
-              <Download size={15} />
-              Export CSV
-            </button>
+            {view === "period" && (
+              <button className="ui-btn ui-btn-outline" onClick={exportCurrent}>
+                <Download size={15} />
+                Export CSV
+              </button>
+            )}
           </>
         }
       />
 
+      <Tabs<ViewId>
+        active={view}
+        onChange={setView}
+        tabs={[
+          { id: "daily", label: "Daily sales (customer-wise)" },
+          { id: "period", label: "Period reports & profit" },
+        ]}
+      />
+
+      {view === "daily" && <DailySalesTab />}
+
+      {view === "period" && (
+      <>
       <Panel>
         <div className="ui-toolbar" style={{ marginBottom: 0 }}>
           <div className="ui-chip-row">
@@ -538,6 +556,8 @@ export default function ReportsPage() {
       <p className="ui-footer-note" style={{ marginTop: -6 }}>
         <IndianRupee size={12} style={{ verticalAlign: "-1px" }} /> All amounts in Indian Rupees.
       </p>
+      </>
+      )}
     </div>
   );
 }

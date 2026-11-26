@@ -63,6 +63,8 @@ export const updateProductVariant = async (
         mrpPerPiece?: number | null;
         landingPricePerCase?: number;
         mrpPerCase?: number;
+        hsnCode?: string | null;
+        gstPercent?: number;
         isActive?: boolean;
     }
 ) => {
@@ -70,6 +72,12 @@ export const updateProductVariant = async (
         updated_at: new Date().toISOString()
     };
 
+    if (input.hsnCode !== undefined) {
+        updateData.hsn_code = input.hsnCode?.trim() || null;
+    }
+    if (input.gstPercent !== undefined) {
+        updateData.gst_percent = input.gstPercent;
+    }
     if (input.variantName !== undefined) {
         updateData.variant_name = input.variantName.trim();
     }
@@ -133,6 +141,8 @@ export interface NewVariantInput {
     mrp_per_piece?: number | null;
     landing_price_per_case: number;
     mrp_per_case: number;
+    hsn_code?: string | null;
+    gst_percent?: number;
     initial_stock_cases?: number;
 }
 

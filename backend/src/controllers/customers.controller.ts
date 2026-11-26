@@ -14,11 +14,21 @@ import {
    VALIDATION
 ========================================= */
 
+const gstSchema = z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/,
+        "Enter a valid 15-character GSTIN."
+    );
+
 const createCustomerSchema = z.object({
     customer_name: z.string().trim().min(1).max(150),
     shop_name: z.string().trim().max(150).optional(),
     mobile: z.string().trim().max(20).optional(),
     address: z.string().trim().max(500).optional(),
+    gst_number: gstSchema.optional(),
     notes: z.string().trim().optional()
 });
 
@@ -27,6 +37,7 @@ const updateCustomerSchema = z.object({
     shop_name: z.string().trim().max(150).nullable().optional(),
     mobile: z.string().trim().max(20).nullable().optional(),
     address: z.string().trim().max(500).nullable().optional(),
+    gst_number: gstSchema.nullable().optional(),
     notes: z.string().trim().nullable().optional()
 });
 

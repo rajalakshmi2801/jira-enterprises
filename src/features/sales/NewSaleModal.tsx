@@ -10,6 +10,7 @@ import {
   Modal,
 } from "../../components/ui";
 import { useAsync } from "../../lib/useAsync";
+import { computeSaleTax } from "../../lib/gst";
 import {
   dateInputToIso,
   formatCurrency,
@@ -76,7 +77,15 @@ export default function NewSaleModal({
 
   const subtotal = lines.reduce((total, line) => total + lineTotal(line), 0);
   const discountValue = Number(discount || 0);
-  const grandTotal = roundMoney(Math.max(0, subtotal - discountValue));
+  // GST (CGST + SGST) is added on top of the price, per product rate.
+  const tax = computeSaleTax(
+    lines.map((line) => ({
+      amount: lineTotal(line),
+      gstPercent: itemMap.get(line.variantId)?.gst_percent ?? 0,
+    })),
+    Math.min(Math.max(discountValue, 0), subtotal)
+  );
+  const grandTotal = tax.total;
 
   const paidAmount =
     payMode === "full"
@@ -374,7 +383,11 @@ export default function NewSaleModal({
                     label="Price / case (₹)"
                     hint={
                       item
-                        ? `Cost ${formatCurrency(item.landing_price_per_case)}`
+                        ? `Cost ${formatCurrency(item.landing_price_per_case)} · ${
+                            item.gst_percent > 0
+                              ? `GST ${item.gst_percent}% extra`
+                              : "No GST"
+                          }`
                         : undefined
                     }
                   >
@@ -518,8 +531,20 @@ export default function NewSaleModal({
               <span>Discount</span>
               <strong>- {formatCurrency(discountValue)}</strong>
             </div>
+            <div className="ui-kv">
+              <span>Taxable value</span>
+              <strong>{formatCurrency(tax.taxable)}</strong>
+            </div>
+            <div className="ui-kv">
+              <span>CGST</span>
+              <strong>{formatCurrency(tax.gst / 2)}</strong>
+            </div>
+            <div className="ui-kv">
+              <span>SGST</span>
+              <strong>{formatCurrency(tax.gst / 2)}</strong>
+            </div>
             <div className="ui-kv ui-grand">
-              <span>Total</span>
+              <span>Total (incl. GST)</span>
               <strong>{formatCurrency(grandTotal)}</strong>
             </div>
             <div className="ui-kv">

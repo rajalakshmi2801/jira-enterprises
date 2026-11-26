@@ -57,6 +57,8 @@ export interface Variant {
   mrp_per_piece: number | null;
   landing_price_per_case: number;
   mrp_per_case: number;
+  hsn_code: string | null;
+  gst_percent: number;
   is_active: boolean;
 }
 
@@ -78,6 +80,8 @@ export interface NewVariantInput {
   pieces_per_case: number;
   landing_price_per_case: number;
   mrp_per_case: number;
+  hsn_code?: string | null;
+  gst_percent?: number;
   landing_price_per_piece?: number | null;
   mrp_per_piece?: number | null;
   initial_stock_cases?: number;
@@ -92,6 +96,8 @@ export interface VariantUpdate {
   mrpPerPiece?: number | null;
   landingPricePerCase?: number;
   mrpPerCase?: number;
+  hsnCode?: string | null;
+  gstPercent?: number;
   isActive?: boolean;
 }
 
@@ -123,6 +129,8 @@ export const productsApi = {
     piecesPerCase: number;
     landingPricePerCase: number;
     mrpPerCase: number;
+    hsnCode?: string;
+    gstPercent?: number;
   }) => api.post("/products/variants", input),
   updateVariant: (id: string, input: VariantUpdate) =>
     api.put(`/products/variants/${id}`, input),
@@ -141,6 +149,8 @@ export interface InventoryItem {
   pieces_per_case: number;
   landing_price_per_case: number;
   mrp_per_case: number;
+  hsn_code: string | null;
+  gst_percent: number;
   available_cases: number;
 }
 
@@ -186,6 +196,7 @@ export interface Customer {
   shop_name: string | null;
   mobile: string | null;
   address: string | null;
+  gst_number: string | null;
   notes: string | null;
   is_active: boolean;
   created_at: string;
@@ -196,6 +207,7 @@ export interface CustomerInput {
   shop_name?: string | null;
   mobile?: string | null;
   address?: string | null;
+  gst_number?: string | null;
   notes?: string | null;
 }
 
@@ -239,6 +251,12 @@ export interface SaleLine {
   cost_price_per_case: number;
   selling_price_per_case: number;
   subtotal: number;
+  hsn_code: string | null;
+  gst_percent: number | null;
+  discount_amount: number | null;
+  taxable_value: number | null;
+  cgst_amount: number | null;
+  sgst_amount: number | null;
   product_variants: {
     variant_name: string;
     size_value: number | null;
@@ -253,6 +271,7 @@ export interface SaleCustomer {
   shop_name: string | null;
   mobile: string | null;
   address?: string | null;
+  gst_number?: string | null;
 }
 
 export interface Sale {
@@ -261,6 +280,7 @@ export interface Sale {
   customer_id: string | null;
   sale_date: string;
   total_amount: number;
+  gst_amount: number | null;
   discount_amount: number;
   notes: string | null;
   status: "completed" | "cancelled";
@@ -507,7 +527,39 @@ export interface ReportRange {
   to: string;
 }
 
+export interface DailySaleRow {
+  sale_id: string;
+  invoice_number: string | null;
+  sale_date: string;
+  customer_name: string;
+  customer_gst: string | null;
+  products: Array<{ name: string; cases: number; rate: number; amount: number }>;
+  total_cases: number;
+  discount: number;
+  total_amount: number;
+  paid_amount: number;
+  pending_amount: number;
+}
+
+export interface DailySalesReport {
+  period: ReportRange;
+  summary: {
+    invoices: number;
+    cases: number;
+    amount: number;
+    paid: number;
+    pending: number;
+  };
+  rows: DailySaleRow[];
+}
+
 export const reportsApi = {
+  dailySales: (range: ReportRange) =>
+    data<DailySalesReport>(
+      api.get("/reports/daily-sales", {
+        params: { ...range, tz: new Date().getTimezoneOffset() },
+      })
+    ),
   overview: (range: ReportRange) =>
     data<{
       sales: {
@@ -582,6 +634,10 @@ export interface BusinessSettings {
   owner_name: string;
   email: string | null;
   mobile: string;
+  gst_number: string | null;
+  business_address: string | null;
+  licence_number: string | null;
+  licence_expiry: string | null;
 }
 
 export const settingsApi = {
@@ -590,5 +646,9 @@ export const settingsApi = {
     business_name?: string;
     owner_name?: string;
     email?: string | null;
+    gst_number?: string | null;
+    business_address?: string | null;
+    licence_number?: string | null;
+    licence_expiry?: string | null;
   }) => data<BusinessSettings>(api.patch("/settings", input)),
 };

@@ -26,6 +26,8 @@ const variantUpdateSchema = z.object({
     mrpPerPiece: z.number().nonnegative().nullable().optional(),
     landingPricePerCase: z.number().nonnegative().optional(),
     mrpPerCase: z.number().nonnegative().optional(),
+    hsnCode: z.string().trim().max(10).nullable().optional(),
+    gstPercent: z.number().min(0).max(100).optional(),
     isActive: z.boolean().optional()
 });
 
@@ -44,6 +46,8 @@ const productWithVariantsSchema = z.object({
             mrp_per_piece: z.number().nonnegative().nullable().optional(),
             landing_price_per_case: z.number().nonnegative(),
             mrp_per_case: z.number().nonnegative(),
+            hsn_code: z.string().trim().max(10).nullable().optional(),
+            gst_percent: z.number().min(0).max(100).optional(),
             initial_stock_cases: z.number().int().nonnegative().optional()
         })
     ).min(1)

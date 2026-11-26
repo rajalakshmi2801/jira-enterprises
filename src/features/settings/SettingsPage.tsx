@@ -14,6 +14,7 @@ import Logo from "../../components/Logo";
 import { useAuth } from "../auth/useAuth";
 import { useAsync } from "../../lib/useAsync";
 import { getErrorMessage } from "../../lib/format";
+import { gstinError, normalizeGstin } from "../../lib/gst";
 import {
   settingsApi,
   type BusinessSettings,
@@ -31,6 +32,10 @@ function SettingsForm({
   const [businessName, setBusinessName] = useState(settings.business_name ?? "");
   const [ownerName, setOwnerName] = useState(settings.owner_name);
   const [email, setEmail] = useState(settings.email ?? "");
+  const [gst, setGst] = useState(settings.gst_number ?? "");
+  const [address, setAddress] = useState(settings.business_address ?? "");
+  const [licence, setLicence] = useState(settings.licence_number ?? "");
+  const [licenceExpiry, setLicenceExpiry] = useState(settings.licence_expiry ?? "");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -50,6 +55,13 @@ function SettingsForm({
       return;
     }
 
+    const gstProblem = gstinError(gst);
+
+    if (gstProblem) {
+      setError(gstProblem);
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -57,6 +69,10 @@ function SettingsForm({
         business_name: businessName.trim(),
         owner_name: ownerName.trim(),
         email: email.trim() || null,
+        gst_number: gst.trim() || null,
+        business_address: address.trim() || null,
+        licence_number: licence.trim() || null,
+        licence_expiry: licenceExpiry || null,
       });
 
       toast.success("Settings saved.");
@@ -99,6 +115,44 @@ function SettingsForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={!canEdit}
+          />
+        </Field>
+
+        <Field label="Business GSTIN" hint="Printed on every receipt as the distributor GST number" span={2}>
+          <input
+            value={gst}
+            onChange={(e) => {
+              setGst(normalizeGstin(e.target.value));
+              setError("");
+            }}
+            placeholder="33ABCDE1234F1Z5"
+            maxLength={15}
+            disabled={!canEdit}
+          />
+        </Field>
+
+        <Field label="Business address" hint="Printed on the receipt" span={2}>
+          <textarea
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            disabled={!canEdit}
+          />
+        </Field>
+
+        <Field label="Licence no. (FSSAI / other)" hint="Printed on the invoice">
+          <input
+            value={licence}
+            onChange={(e) => setLicence(e.target.value)}
+            disabled={!canEdit}
+          />
+        </Field>
+
+        <Field label="Licence expiry date">
+          <input
+            type="date"
+            value={licenceExpiry}
+            onChange={(e) => setLicenceExpiry(e.target.value)}
             disabled={!canEdit}
           />
         </Field>
@@ -151,7 +205,7 @@ export default function SettingsPage() {
             <ErrorState message={error ?? "Settings not found."} onRetry={reload} />
           ) : (
             <SettingsForm
-              key={`${data.business_name}-${data.owner_name}-${data.email}`}
+              key={`${data.business_name}-${data.owner_name}-${data.email}-${data.gst_number}-${data.business_address}-${data.licence_number}-${data.licence_expiry}`}
               settings={data}
               canEdit={isOwner}
               onSaved={reload}

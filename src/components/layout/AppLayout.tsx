@@ -7,6 +7,7 @@ import Header from "./Header";
 const pageTitles: Record<string, string> = {
   "/": "Dashboard",
   "/sales": "Sales",
+  "/invoices": "Invoices",
   "/customers": "Customers",
   "/inventory": "Inventory",
   "/purchases": "Purchases",
@@ -22,7 +23,9 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
-  const pageTitle = pageTitles[location.pathname] ?? "Jira Enterprises";
+  const pageTitle = location.pathname.startsWith("/invoices/")
+    ? "Invoice"
+    : (pageTitles[location.pathname] ?? "Jira Enterprises");
 
   return (
     <div className="app-layout">

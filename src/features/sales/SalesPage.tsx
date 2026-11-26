@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 import {
   Eye,
   IndianRupee,
   Plus,
-  Printer,
+  FileText,
   RefreshCw,
   Search,
   ShoppingCart,
@@ -29,10 +29,8 @@ import {
   formatCurrency,
   formatDate,
   formatDateTime,
-  getErrorMessage,
   toDateInput,
 } from "../../lib/format";
-import { printInvoice } from "../../lib/invoice";
 import {
   paidOf,
   salesApi,
@@ -80,16 +78,6 @@ function SaleDetails({
   const paid = sale ? paidOf(sale) : 0;
   const pending = sale ? Number(sale.total_amount) - paid : 0;
 
-  function print() {
-    if (!sale) return;
-
-    try {
-      printInvoice(sale);
-    } catch (err) {
-      toast.error(getErrorMessage(err));
-    }
-  }
-
   return (
     <Modal
       title="Sale details"
@@ -99,10 +87,13 @@ function SaleDetails({
       footer={
         sale && (
           <>
-            <button className="ui-btn ui-btn-outline" onClick={print}>
-              <Printer size={15} />
-              Print invoice
-            </button>
+            <Link
+              to={`/invoices/${sale.id}`}
+              className="ui-btn ui-btn-primary"
+            >
+              <FileText size={15} />
+              Generate invoice
+            </Link>
             {isOwner && pending > 0 && sale.status === "completed" && (
               <button
                 className="ui-btn ui-btn-success"
@@ -112,7 +103,7 @@ function SaleDetails({
                 Collect payment
               </button>
             )}
-            <button className="ui-btn ui-btn-primary" onClick={onClose}>
+            <button className="ui-btn ui-btn-outline" onClick={onClose}>
               Close
             </button>
           </>
@@ -158,6 +149,12 @@ function SaleDetails({
             <span>Date</span>
             <strong>{formatDateTime(sale.sale_date)}</strong>
           </div>
+          {Number(sale.gst_amount ?? 0) > 0 && (
+            <div className="ui-kv">
+              <span>GST included in total</span>
+              <strong>{formatCurrency(sale.gst_amount)}</strong>
+            </div>
+          )}
           <div className="ui-kv">
             <span>Payment status</span>
             <strong>

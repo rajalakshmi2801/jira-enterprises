@@ -69,6 +69,8 @@ export const getInventory = async () => {
             pieces_per_case: variant.pieces_per_case,
             landing_price_per_case: variant.landing_price_per_case,
             mrp_per_case: variant.mrp_per_case,
+            hsn_code: variant.hsn_code ?? null,
+            gst_percent: Number(variant.gst_percent ?? 0),
             available_cases: availableCases
         };
     });

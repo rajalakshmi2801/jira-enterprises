@@ -34,7 +34,9 @@ const variantSchema = z.object({
     landingPricePerPiece: z.number().nonnegative().nullable().optional(),
     mrpPerPiece: z.number().nonnegative().nullable().optional(),
     landingPricePerCase: z.number().nonnegative(),
-    mrpPerCase: z.number().nonnegative()
+    mrpPerCase: z.number().nonnegative(),
+    hsnCode: z.string().trim().max(10).optional(),
+    gstPercent: z.number().min(0).max(100).optional()
 });
 
 // GET categories

@@ -28,6 +28,7 @@ import {
   StatCard,
 } from "../../components/ui";
 import { useAuth } from "../auth/useAuth";
+import { gstinError, normalizeGstin } from "../../lib/gst";
 import { useAsync } from "../../lib/useAsync";
 import {
   formatCurrency,
@@ -47,6 +48,7 @@ const emptyForm = {
   shop_name: "",
   mobile: "",
   address: "",
+  gst_number: "",
   notes: "",
 };
 
@@ -72,6 +74,7 @@ function CustomerForm({
           shop_name: customer.shop_name ?? "",
           mobile: customer.mobile ?? "",
           address: customer.address ?? "",
+          gst_number: customer.gst_number ?? "",
           notes: customer.notes ?? "",
         }
       : emptyForm
@@ -92,6 +95,13 @@ function CustomerForm({
       return;
     }
 
+    const gstProblem = gstinError(form.gst_number);
+
+    if (gstProblem) {
+      setError(gstProblem);
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -101,6 +111,7 @@ function CustomerForm({
           shop_name: form.shop_name.trim() || null,
           mobile: form.mobile.trim() || null,
           address: form.address.trim() || null,
+          gst_number: form.gst_number.trim() || null,
           notes: form.notes.trim() || null,
         };
 
@@ -112,6 +123,7 @@ function CustomerForm({
           ...(form.shop_name.trim() && { shop_name: form.shop_name.trim() }),
           ...(form.mobile.trim() && { mobile: form.mobile.trim() }),
           ...(form.address.trim() && { address: form.address.trim() }),
+          ...(form.gst_number.trim() && { gst_number: form.gst_number.trim() }),
           ...(form.notes.trim() && { notes: form.notes.trim() }),
         };
 
@@ -168,6 +180,15 @@ function CustomerForm({
             type="tel"
             value={form.mobile}
             onChange={(e) => update("mobile", e.target.value)}
+          />
+        </Field>
+
+        <Field label="Customer GSTIN (optional)" span={2} hint="15 characters - printed on the receipt">
+          <input
+            value={form.gst_number}
+            onChange={(e) => update("gst_number", normalizeGstin(e.target.value))}
+            placeholder="33ABCDE1234F1Z5"
+            maxLength={15}
           />
         </Field>
 
@@ -254,6 +275,10 @@ function CustomerDetails({
       <div className="ui-kv">
         <span>Mobile</span>
         <strong>{customer.mobile || "-"}</strong>
+      </div>
+      <div className="ui-kv">
+        <span>GSTIN</span>
+        <strong>{customer.gst_number || "-"}</strong>
       </div>
       <div className="ui-kv">
         <span>Address</span>
@@ -497,6 +522,9 @@ export default function CustomersPage() {
                           <span className="ui-sub">
                             {customer.customer_name}
                           </span>
+                        )}
+                        {customer.gst_number && (
+                          <span className="ui-sub">GSTIN {customer.gst_number}</span>
                         )}
                       </td>
                       <td>

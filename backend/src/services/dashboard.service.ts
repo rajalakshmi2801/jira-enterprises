@@ -32,7 +32,7 @@ export const getDashboardData = async () => {
     ] = await Promise.all([
         supabase
             .from("sales")
-            .select("id, total_amount, sale_date")
+            .select("id, total_amount, gst_amount, sale_date")
             .eq("status", "completed")
             .gte("sale_date", start)
             .lte("sale_date", end),
@@ -165,7 +165,13 @@ export const getDashboardData = async () => {
         0
     );
 
-    const grossProfitToday = totalSalesToday - costOfGoodsToday;
+    // GST collected is not income, so profit uses the sales value without GST.
+    const gstToday = todaySales.reduce(
+        (total, sale) => total + Number(sale.gst_amount ?? 0),
+        0
+    );
+
+    const grossProfitToday = totalSalesToday - gstToday - costOfGoodsToday;
 
     const estimatedNetProfitToday =
         grossProfitToday - totalExpensesToday;

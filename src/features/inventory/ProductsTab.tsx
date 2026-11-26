@@ -35,6 +35,8 @@ interface VariantDraft {
   pieces_per_case: string;
   landing: string;
   mrp: string;
+  hsn_code: string;
+  gst_percent: string;
   stock: string;
 }
 
@@ -45,6 +47,8 @@ const emptyVariant: VariantDraft = {
   pieces_per_case: "",
   landing: "",
   mrp: "",
+  hsn_code: "",
+  gst_percent: "0",
   stock: "",
 };
 
@@ -56,6 +60,8 @@ function draftFromVariant(variant: Variant): VariantDraft {
     pieces_per_case: String(variant.pieces_per_case),
     landing: String(variant.landing_price_per_case),
     mrp: String(variant.mrp_per_case),
+    hsn_code: variant.hsn_code ?? "",
+    gst_percent: String(variant.gst_percent ?? 0),
     stock: "",
   };
 }
@@ -67,6 +73,8 @@ function parseVariant(draft: VariantDraft, label: string) {
   const mrp = Number(draft.mrp);
   const stock = draft.stock === "" ? 0 : Number(draft.stock);
   const size = draft.size_value === "" ? null : Number(draft.size_value);
+  const gst = draft.gst_percent === "" ? 0 : Number(draft.gst_percent);
+  const hsn = draft.hsn_code.trim();
 
   if (!draft.variant_name.trim()) {
     return { error: `${label}: enter a variant name (for example “500 ml”).` };
@@ -83,6 +91,12 @@ function parseVariant(draft: VariantDraft, label: string) {
   if (size !== null && (!Number.isFinite(size) || size <= 0)) {
     return { error: `${label}: size must be a positive number.` };
   }
+  if (!Number.isFinite(gst) || gst < 0 || gst > 100) {
+    return { error: `${label}: GST % must be between 0 and 100 (use 0 for water).` };
+  }
+  if (hsn && !/^[0-9]{4,8}$/.test(hsn)) {
+    return { error: `${label}: HSN code must be 4 to 8 digits.` };
+  }
   if (!Number.isInteger(stock) || stock < 0) {
     return { error: `${label}: opening stock must be a whole number of cases.` };
   }
@@ -96,6 +110,8 @@ function parseVariant(draft: VariantDraft, label: string) {
       landing,
       mrp,
       stock,
+      hsn: hsn || null,
+      gst,
       landingPiece: roundMoney(landing / pieces),
       mrpPiece: roundMoney(mrp / pieces),
     },
@@ -186,6 +202,29 @@ function VariantFields({
         />
       </Field>
 
+      <Field label="HSN code (for invoice)" hint="4 to 8 digits, optional">
+        <input
+          inputMode="numeric"
+          maxLength={8}
+          value={draft.hsn_code}
+          onChange={(e) => set("hsn_code", e.target.value.replace(/[^0-9]/g, ""))}
+        />
+      </Field>
+
+      <Field
+        label="GST % (CGST + SGST)"
+        hint="0 for water. 18 means 9% CGST + 9% SGST added on top of the price"
+      >
+        <input
+          type="number"
+          min={0}
+          max={100}
+          step="0.01"
+          value={draft.gst_percent}
+          onChange={(e) => set("gst_percent", e.target.value)}
+        />
+      </Field>
+
       {showStock && (
         <Field
           label="Opening stock (cases)"
@@ -268,6 +307,8 @@ function NewProductModal({
         pieces_per_case: v.pieces,
         landing_price_per_case: v.landing,
         mrp_per_case: v.mrp,
+        hsn_code: v.hsn,
+        gst_percent: v.gst,
         landing_price_per_piece: v.landingPiece,
         mrp_per_piece: v.mrpPiece,
         initial_stock_cases: v.stock,
@@ -472,6 +513,8 @@ function VariantModal({
           piecesPerCase: v.pieces,
           landingPricePerCase: v.landing,
           mrpPerCase: v.mrp,
+          hsnCode: v.hsn,
+          gstPercent: v.gst,
           landingPricePerPiece: v.landingPiece,
           mrpPerPiece: v.mrpPiece,
         });
@@ -485,6 +528,8 @@ function VariantModal({
           piecesPerCase: v.pieces,
           landingPricePerCase: v.landing,
           mrpPerCase: v.mrp,
+          ...(v.hsn && { hsnCode: v.hsn }),
+          gstPercent: v.gst,
         });
 
         const newId = (response.data as { variant?: { id: string } }).variant?.id;
@@ -848,6 +893,7 @@ export default function ProductsTab({
                       <th className="ui-num">Landing / case</th>
                       <th className="ui-num">MRP / case</th>
                       <th className="ui-num">Margin / case</th>
+                      <th className="ui-num">GST</th>
                       <th>Status</th>
                       {isOwner && <th />}
                     </tr>
@@ -855,7 +901,7 @@ export default function ProductsTab({
                   <tbody>
                     {product.product_variants.length === 0 ? (
                       <tr>
-                        <td colSpan={7} style={{ color: "#8992a3" }}>
+                        <td colSpan={8} style={{ color: "#8992a3" }}>
                           No variants yet.
                         </td>
                       </tr>
@@ -877,6 +923,14 @@ export default function ProductsTab({
                             {formatCurrency(
                               Number(variant.mrp_per_case) -
                                 Number(variant.landing_price_per_case)
+                            )}
+                          </td>
+                          <td className="ui-num">
+                            {Number(variant.gst_percent) > 0
+                              ? `${variant.gst_percent}%`
+                              : "No GST"}
+                            {variant.hsn_code && (
+                              <span className="ui-sub">HSN {variant.hsn_code}</span>
                             )}
                           </td>
                           <td>

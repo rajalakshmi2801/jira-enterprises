@@ -120,6 +120,8 @@ export const createProductVariant = async (input: {
     mrpPerPiece?: number | null;
     landingPricePerCase: number;
     mrpPerCase: number;
+    hsnCode?: string;
+    gstPercent?: number;
 }) => {
     const { data, error } = await supabase
         .from("product_variants")
@@ -133,7 +135,9 @@ export const createProductVariant = async (input: {
                 input.landingPricePerPiece ?? null,
             mrp_per_piece: input.mrpPerPiece ?? null,
             landing_price_per_case: input.landingPricePerCase,
-            mrp_per_case: input.mrpPerCase
+            mrp_per_case: input.mrpPerCase,
+            hsn_code: input.hsnCode?.trim() || null,
+            gst_percent: input.gstPercent ?? 0
         })
         .select()
         .single();

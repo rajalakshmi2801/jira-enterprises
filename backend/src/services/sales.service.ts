@@ -59,6 +59,7 @@ export const getSalesHistory = async (limit = 100) => {
             customer_id,
             sale_date,
             total_amount,
+            gst_amount,
             discount_amount,
             notes,
             status,
@@ -67,7 +68,8 @@ export const getSalesHistory = async (limit = 100) => {
                 id,
                 customer_name,
                 shop_name,
-                mobile
+                mobile,
+                gst_number
             ),
             sale_items (
                 id,
@@ -76,6 +78,12 @@ export const getSalesHistory = async (limit = 100) => {
                 cost_price_per_case,
                 selling_price_per_case,
                 subtotal,
+                hsn_code,
+                gst_percent,
+                discount_amount,
+                taxable_value,
+                cgst_amount,
+                sgst_amount,
                 product_variants (
                 variant_name,
                 size_value,
@@ -117,6 +125,7 @@ export const getSaleById = async (saleId: string) => {
             customer_id,
             sale_date,
             total_amount,
+            gst_amount,
             discount_amount,
             notes,
             status,
@@ -127,7 +136,8 @@ export const getSaleById = async (saleId: string) => {
                 customer_name,
                 shop_name,
                 mobile,
-                address
+                address,
+                gst_number
             ),
             sale_items (
                 id,
@@ -136,6 +146,12 @@ export const getSaleById = async (saleId: string) => {
                 cost_price_per_case,
                 selling_price_per_case,
                 subtotal,
+                hsn_code,
+                gst_percent,
+                discount_amount,
+                taxable_value,
+                cgst_amount,
+                sgst_amount,
                 product_variants (
                     variant_name,
                     size_value,
@@ -185,6 +201,7 @@ export const getCustomerSales = async (
             customer_id,
             sale_date,
             total_amount,
+            gst_amount,
             discount_amount,
             status,
             sale_items (
@@ -257,6 +274,7 @@ export const getCustomerOutstandingBalances = async () => {
             customer_id,
             sale_date,
             total_amount,
+            gst_amount,
             discount_amount,
             status,
             customers (
